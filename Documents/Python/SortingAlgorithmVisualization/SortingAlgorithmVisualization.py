@@ -10,12 +10,12 @@ class Sorter:
     def __init__(self, master):
         self.master = master
         master.title("Sorting")
-        master.geometry(self.width + "x" + self.height)
+        master.geometry(str(self.width) + "x" + str(self.height))
         master.config(background = 'black')
-        randList = generate_list(100)
-        draw(master)
+        self.randList = self.generate_list(100)
+        self.draw(self.randList, master)
 
-    def generate_list(num):
+    def generate_list(self, num):
         list = []
         while len(list) != num:
             rand = random.randint(1,num)
@@ -23,11 +23,9 @@ class Sorter:
                 list.append(rand)
         return list
 
-    def draw(list, window):
-        top = tkinter.Tk()
-        top.mainloop()
+    def draw(self, list, window):
         for num in list:
-            canvas = Canvas(master, width=width/len(randList), height=(height/len(randList))*num)
+            canvas = Canvas(window, width=self.width/len(self.randList), height=(self.height/len(self.randList))*num)
             canvas.pack()
 
 
