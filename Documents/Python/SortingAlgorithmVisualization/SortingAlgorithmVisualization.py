@@ -3,8 +3,8 @@ from tkinter import *
 
 class Sorter:
 
-    height = 800
-    width = 1000
+    height = 600
+    width = 800
     randList = []
 
     def __init__(self, master):
@@ -24,11 +24,16 @@ class Sorter:
         return list
 
     def draw(self, list, window):
+        canvas = Canvas(window, width=self.width, height=self.height, highlightthickness=0, bg="black")
         for num in list:
-            canvas = Canvas(window, width=self.width/len(self.randList), height=(self.height/len(self.randList))*num)
+            canvas.create_rectangle(list.index(num)*(self.width/len(list)),,list.index(num)*(self.width/len(list))+(len(list)/self.width),150, fill="red")
             canvas.pack()
 
+def main():
+    root = Tk()
+    my_gui = Sorter(root)
+    print(my_gui.randList)
+    root.mainloop()
 
-root = Tk()
-my_gui = Sorter(root)
-root.mainloop()
+if __name__ == '__main__':
+    main()
