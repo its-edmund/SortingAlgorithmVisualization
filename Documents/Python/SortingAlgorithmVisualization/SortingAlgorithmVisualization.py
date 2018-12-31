@@ -19,14 +19,16 @@ class Sorter:
         self.master.config(background='black')
         self.randList = self.generate_list(50)
         self.oldRandList = [range(1,len(self.randList))]
-        print(self.randList)
+
         self.draw(self.randList, self.oldRandList)
-        self.cocktail_shaker_sort(self.randList, self.oldRandList)
+        #self.cocktail_shaker_sort(self.randList, self.oldRandList)
+        self.bubble_sort(self.randList, self.oldRandList)
+        self.pulse(self.randList)
         self.randList = self.generate_list(50)
         self.oldRandList = [range(1, len(self.randList))]
-        print(self.randList)
         self.draw(self.randList, self.oldRandList)
-        self.bubble_sort(self.randList, self.oldRandList)
+        self.cocktail_shaker_sort(self.randList, self.oldRandList)
+        self.pulse(self.randList)
 
     def generate_list(self, num):
         list = []
@@ -67,24 +69,44 @@ class Sorter:
                                                               self.width / len(list)), self.height, fill='white')
         self.master.update()
 
-    def draw_with_red(self, list, oldList, index):
-        self.bar_display.delete("all")
-        for num in list:
-            if num not in oldList or list.index(num) != oldList.index(num):
-                self.bar_display.create_rectangle(list.index(num) * (self.width / len(list)),
-                                                  self.height - (num * self.height / len(list)),
-                                                  list.index(num) * (self.width / len(list)) + (
-                                                          self.width / len(list)), self.height, fill='white')
-        for i in index:
-            self.bar_display.create_rectangle(i * (self.width / len(list)),
-                                              self.height - (list[i] * self.height / len(list)),
-                                              i * (self.width / len(list)) + (
-                                                      self.width / len(list)), self.height, fill='red')
-        self.bar_display.pack()
-        self.master.update()
+    def draw_with_red(self, list, index, oldList=None):
+        tempList = list
+        if oldList is None:
+            self.bar_display.delete("all")
+            for num in tempList:
+                self.bar_display.create_rectangle(tempList.index(num) * (self.width / len(tempList)),
+                                                  self.height - (num * self.height / len(tempList)),
+                                                  tempList.index(num) * (self.width / len(tempList)) + (
+                                                          self.width / len(tempList)), self.height, fill='white')
+            for i in index:
+                self.bar_display.create_rectangle(i * (self.width / len(tempList)),
+                                                  self.height - (tempList[i] * self.height / len(tempList)),
+                                                  i * (self.width / len(tempList)) + (
+                                                          self.width / len(tempList)), self.height, fill='red')
+            self.bar_display.pack()
+            self.master.update()
+        else:
+            self.bar_display.delete("all")
+            for num in tempList:
+                if num not in oldList or tempList.index(num) != oldList.index(num):
+                    self.bar_display.create_rectangle(tempList.index(num) * (self.width / len(tempList)),
+                                                      self.height - (num * self.height / len(tempList)),
+                                                      tempList.index(num) * (self.width / len(tempList)) + (
+                                                              self.width / len(tempList)), self.height, fill='white')
+            for i in index:
+                self.bar_display.create_rectangle(i * (self.width / len(tempList)),
+                                                  self.height - (tempList[i] * self.height / len(tempList)),
+                                                  i * (self.width / len(tempList)) + (
+                                                          self.width / len(tempList)), self.height, fill='red')
+            self.bar_display.pack()
+            self.master.update()
 
-    def pulse(self):
-        pass
+        list = tempList
+
+    def pulse(self,list):
+        self.draw(list)
+        for i in range(0, len(list)+1):
+            self.draw_with_red(list, range(0,i))
 
     def bubble_sort(self, list, oldList):
         self.oldRandList = self.randList
@@ -99,12 +121,12 @@ class Sorter:
                     list[index - 1] = list[index]
                     list[index] = temp
                     new_length_list = index
-                self.draw_with_red(list, oldList, [index, index-1])
+                self.draw_with_red(list, [index, index-1], oldList)
             length_list = new_length_list
 
     def cocktail_shaker_sort(self, list, oldList):
-        begIndex = 1
-        endIndex = len(list)-1
+        begIndex = 0
+        endIndex = len(list)-2
         while begIndex <= endIndex:
             newBegIndex = endIndex
             newEndIndex = begIndex
@@ -114,16 +136,16 @@ class Sorter:
                     list[i + 1] = list[i]
                     list[i] = temp
                     newEndIndex = i
-                self.draw(list)
-            endIndex = newEndIndex - 1;
+                self.draw_with_red(list, [i+1])
+            endIndex = newEndIndex + 1;
             for i in range(endIndex,begIndex, -1):
                 if list[i] > list[i + 1]:
                     temp = list[i + 1]
                     list[i + 1] = list[i]
                     list[i] = temp
                     newBegIndex = i
-                self.draw(list)
-            begIndex = newBegIndex + 1
+                self.draw_with_red(list, [i])
+            begIndex = newBegIndex - 1
 
 def main():
     root = Tk()
