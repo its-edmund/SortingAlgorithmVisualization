@@ -2,13 +2,15 @@ import random
 import time
 from tkinter import *
 from abc import ABC, abstractmethod
+from sorting_visualization.algorithms import BubbleSort
+import queue
+import threading
 
 
 class Sorter:
     bar_display = None
     height = 600
     width = 800
-    randList = []
     oldRandList = []
     master = None
     algorithm_processing = None
@@ -25,13 +27,7 @@ class Sorter:
     def set_algorithm(self, algorithm):
         self.algorithm_processing = algorithm
 
-    def generate_list(self, num):
-        list = []
-        while len(list) != num:
-            rand = random.randint(1, num)
-            if not rand in list:
-                list.append(rand)
-        return list
+
 
     """def draw(self, list):
         self.bar_display.delete("all")
@@ -103,10 +99,10 @@ class Sorter:
             self.draw(self.algorithm_processing.step())
             self.bar_display.after(25)
 
-    def pulse(self,list):
-        self.draw(list)
-        for i in range(0, len(list)+1):
-            self.draw_with_red(list, range(0,i))
+    def pulse(self):
+        self.draw(self.algorithm_processing.list)
+        for i in range(0, len(self.algorithm_processing.list)+1):
+            self.draw_with_red(self.algorithm_processing.list, range(0,i))
 
 
 class SortingAlgorithm(ABC):
@@ -125,6 +121,14 @@ class SortingAlgorithm(ABC):
     @abstractmethod
     def sort(self):
         return
+
+    def generate_list(self, num=100):
+        self.list = []
+        while len(list) != num:
+            rand = random.randint(1, num)
+            if not rand in list:
+                list.append(rand)
+        return list
 
 
 class BubbleSort(SortingAlgorithm):
@@ -200,10 +204,11 @@ class CocktailShakerSort(SortingAlgorithm):
 def main():
     root = Tk()
     sorter = Sorter(root)
-    cs = CocktailShakerSort(sorter.generate_list(200))
+    #cs = CocktailShakerSort(sorter.generate_list(200))
     bs = BubbleSort(sorter.generate_list(200))
-    sorter.set_algorithm(cs)
+    sorter.set_algorithm(bs)
     sorter.draw_algorithm()
+    sorter.pulse()
     root.mainloop()
 
 
