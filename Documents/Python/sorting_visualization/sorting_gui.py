@@ -2,7 +2,7 @@ import random
 import time
 from tkinter import *
 from abc import ABC, abstractmethod
-from sorting_visualization.algorithms import BubbleSort
+from .algorithms import BubbleSort
 import queue
 import threading
 
