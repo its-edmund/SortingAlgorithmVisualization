@@ -1,6 +1,7 @@
 import random
 import time
 from tkinter import *
+from abc import ABC, abstractmethod
 
 
 class Sorter:
@@ -10,6 +11,7 @@ class Sorter:
     randList = []
     oldRandList = []
     master = None
+    algorithm_processing = None
 
     def __init__(self, master):
         self.master = master
@@ -20,15 +22,8 @@ class Sorter:
         self.randList = self.generate_list(50)
         self.oldRandList = [range(1,len(self.randList))]
 
-        self.draw(self.randList, self.oldRandList)
-        #self.cocktail_shaker_sort(self.randList, self.oldRandList)
-        self.bubble_sort(self.randList, self.oldRandList)
-        self.pulse(self.randList)
-        self.randList = self.generate_list(50)
-        self.oldRandList = [range(1, len(self.randList))]
-        self.draw(self.randList, self.oldRandList)
-        self.cocktail_shaker_sort(self.randList, self.oldRandList)
-        self.pulse(self.randList)
+    def set_algorithm(self, algorithm):
+        self.algorithm_processing = algorithm
 
     def generate_list(self, num):
         list = []
@@ -103,53 +98,112 @@ class Sorter:
 
         list = tempList
 
+    def draw_algorithm(self):
+        for i in range(0,self.algorithm_processing.length_list):
+            self.draw(self.algorithm_processing.step())
+            self.bar_display.after(25)
+
     def pulse(self,list):
         self.draw(list)
         for i in range(0, len(list)+1):
             self.draw_with_red(list, range(0,i))
 
-    def bubble_sort(self, list, oldList):
-        self.oldRandList = self.randList
-        length_list = len(list)
-        while (length_list != 0):
-            new_length_list = 0
-            index = 1
-            for index in range(1, length_list):
 
-                if list[index - 1] > list[index]:
-                    temp = list[index - 1]
-                    list[index - 1] = list[index]
-                    list[index] = temp
-                    new_length_list = index
-                self.draw_with_red(list, [index, index-1], oldList)
-            length_list = new_length_list
+class SortingAlgorithm(ABC):
 
-    def cocktail_shaker_sort(self, list, oldList):
-        begIndex = 0
-        endIndex = len(list)-2
-        while begIndex <= endIndex:
-            newBegIndex = endIndex
-            newEndIndex = begIndex
-            for i in range(begIndex, endIndex):
-                if list[i] > list[i + 1]:
-                    temp = list[i + 1]
-                    list[i + 1] = list[i]
-                    list[i] = temp
-                    newEndIndex = i
-                self.draw_with_red(list, [i+1])
-            endIndex = newEndIndex + 1;
-            for i in range(endIndex,begIndex, -1):
-                if list[i] > list[i + 1]:
-                    temp = list[i + 1]
-                    list[i + 1] = list[i]
-                    list[i] = temp
-                    newBegIndex = i
-                self.draw_with_red(list, [i])
-            begIndex = newBegIndex - 1
+    list = []
+    length_list = 0
+
+    def __init__(self, list):
+        self.list = list
+        self.length_list = len(list)
+
+    @abstractmethod
+    def step(self):
+        return
+
+    @abstractmethod
+    def sort(self):
+        return
+
+
+class BubbleSort(SortingAlgorithm):
+
+    new_length_list = 0
+
+    def __init__(self, list):
+        super().__init__(list)
+
+    def set_list(self, list):
+        self.list = list
+
+    def get_list(self):
+        return self.list
+
+    def step(self):
+        self.new_length_list = 0
+        index = 1
+        for index in range(1, self.length_list):
+            if self.list[index - 1] > self.list[index]:
+                temp = self.list[index - 1]
+                self.list[index - 1] = self.list[index]
+                self.list[index] = temp
+                self.new_length_list = index
+        self.length_list = self.new_length_list
+        return self.list
+
+    def sort(self):
+        while True:
+            self.step()
+            if self.length_list is 0:
+                return self.list
+
+
+class CocktailShakerSort(SortingAlgorithm):
+
+    beg_Index = 0
+    end_Index = 0
+    new_Beg_Index = 0
+    new_End_Index = 0
+
+    def __init__(self, list):
+        super().__init__(list)
+        self.beg_Index = 0
+        self.end_Index = len(self.list)-2
+
+    def step(self):
+        self.new_Beg_Index = self.end_Index
+        self.new_End_Index = self.beg_Index
+        for i in range(self.beg_Index, self.end_Index):
+            if self.list[i] > self.list[i + 1]:
+                temp = self.list[i + 1]
+                self.list[i + 1] = self.list[i]
+                self.list[i] = temp
+                self.new_End_Index = i
+                self.drawingList = list
+        self.end_Index = self.new_End_Index + 1;
+        for i in range(self.end_Index, self.beg_Index, -1):
+            if self.list[i] > self.list[i + 1]:
+                temp = self.list[i + 1]
+                self.list[i + 1] = self.list[i]
+                self.list[i] = temp
+                self.new_Beg_Index = i
+        self.beg_Index = self.new_Beg_Index - 1
+        return self.list
+
+    def sort(self):
+        while self.beg_Index <= self.end_Index:
+            self.step()
+        return self.list
+
 
 def main():
     root = Tk()
-    my_gui = Sorter(root)
+    sorter = Sorter(root)
+    cs = CocktailShakerSort(sorter.generate_list(200))
+    bs = BubbleSort(sorter.generate_list(200))
+    sorter.set_algorithm(cs)
+    sorter.draw_algorithm()
     root.mainloop()
 
 
